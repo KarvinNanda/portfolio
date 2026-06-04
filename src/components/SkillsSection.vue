@@ -1,12 +1,11 @@
 <script setup>
-import { NTag } from 'naive-ui'
-import { skills } from '../data/portfolio.js'
+import { skills } from '@/data/portfolio.js'
 
 const categories = [
-  { key: 'frontend', label: 'Frontend', color: 'var(--color-frontend)', items: skills.frontend },
-  { key: 'backend',  label: 'Backend',  color: 'var(--color-backend)',  items: skills.backend },
-  { key: 'database', label: 'Database', color: 'var(--color-database)', items: skills.database },
-  { key: 'devops',   label: 'DevOps',   color: 'var(--color-devops)',   items: skills.devops }
+  { key: 'languages',      label: 'Languages',      color: 'var(--color-languages)',      items: skills.languages },
+  { key: 'frameworks',     label: 'Frameworks',     color: 'var(--color-frameworks)',     items: skills.frameworks },
+  { key: 'database',       label: 'Database',       color: 'var(--color-database)',       items: skills.database },
+  { key: 'infrastructure', label: 'Infrastructure', color: 'var(--color-infrastructure)', items: skills.infrastructure }
 ]
 </script>
 
@@ -40,9 +39,9 @@ const categories = [
       </div>
 
       <div class="languages">
-        <h3 class="languages__title">Languages</h3>
+        <h3 class="languages__title">Spoken Languages</h3>
         <div class="languages__list">
-          <div v-for="lang in skills.languages" :key="lang.name" class="lang-card">
+          <div v-for="lang in skills.spoken" :key="lang.name" class="lang-card">
             <span class="lang-name">{{ lang.name }}</span>
             <span class="lang-level">{{ lang.level }}</span>
           </div>

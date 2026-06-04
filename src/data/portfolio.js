@@ -35,11 +35,11 @@ export const experiences = [
 ]
 
 export const skills = {
-  frontend: ["Vue.js 3"],
-  backend: ["Golang", "PHP", "Laravel", ".NET Core", "Java", "C"],
+  languages: ["Golang", "PHP", "Java", "C#", "C++"],
+  frameworks: ["Gin Gonic", "Laravel", ".NET Core", "Vue.js 3"],
   database: ["MySQL", "SQL Server", "Redis"],
-  devops: ["Linux", "Docker"],
-  languages: [
+  infrastructure: ["Linux", "Docker", "Nginx", "Git"],
+  spoken: [
     { name: "English", level: "Intermediate" },
     { name: "Indonesian", level: "Proficient" },
     { name: "Chinese", level: "Basic" }
