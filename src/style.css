@@ -9,10 +9,10 @@
   --text-muted: #94a3b8;
   --max-width: 1080px;
 
-  --color-frontend: #3b82f6;
-  --color-backend: #10b981;
+  --color-languages: #3b82f6;
+  --color-frameworks: #10b981;
   --color-database: #f59e0b;
-  --color-devops: #a855f7;
+  --color-infrastructure: #a855f7;
 
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   color-scheme: dark;
