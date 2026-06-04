@@ -4,6 +4,21 @@ import { NButton, NIcon } from 'naive-ui'
 import { BrandGithub, BrandLinkedin, Download } from '@vicons/tabler'
 import { profile } from '../data/portfolio.js'
 
+// Google Drive direct-download URL (converted from the share/view link).
+// File ID: 12hzDXXFrxIz8OgDZTCG27oULhlCcjmC-
+const CV_URL = 'https://drive.google.com/uc?export=download&id=12hzDXXFrxIz8OgDZTCG27oULhlCcjmC-'
+
+function downloadCV() {
+  const a = document.createElement('a')
+  a.href = CV_URL
+  a.download = 'Karvin_Nanda_CV.pdf'
+  a.rel = 'noopener noreferrer'
+  a.target = '_blank'
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+}
+
 const typed = ref('')
 let roleIdx = 0
 let charIdx = 0
@@ -61,7 +76,7 @@ onBeforeUnmount(() => {
       <p class="hero__tagline">{{ profile.tagline }}</p>
 
       <div class="hero__cta">
-        <n-button type="primary" size="large" tag="a" href="#" :focusable="false">
+        <n-button type="primary" size="large" @click="downloadCV">
           <template #icon>
             <n-icon><Download /></n-icon>
           </template>
