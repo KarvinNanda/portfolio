@@ -53,8 +53,6 @@ import { profile } from '../data/portfolio.js'
           LinkedIn
         </n-button>
       </div>
-
-      <div class="contact__footer">© 2025 {{ profile.name }}</div>
     </div>
   </section>
 </template>

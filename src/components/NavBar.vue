@@ -90,16 +90,17 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
   left: 0;
   right: 0;
   z-index: 999;
-  background: rgba(10, 15, 26, 0.6);
+  background: transparent;
   border-bottom: 1px solid transparent;
-  transition: background 0.3s ease, border-color 0.3s ease, backdrop-filter 0.3s ease;
+  transition: background 0.4s ease, border-color 0.4s ease, backdrop-filter 0.4s ease, box-shadow 0.4s ease;
 }
 
 .navbar--scrolled {
-  background: rgba(10, 15, 26, 0.75);
-  backdrop-filter: saturate(180%) blur(14px);
-  -webkit-backdrop-filter: saturate(180%) blur(14px);
-  border-bottom-color: rgba(255, 255, 255, 0.08);
+  background: rgba(5, 8, 16, 0.7);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom-color: var(--border);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
 }
 
 .navbar__inner {
@@ -151,9 +152,10 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
   left: 0;
   bottom: -6px;
   width: 0;
-  height: 1px;
-  background: var(--accent);
-  transition: width 0.2s ease;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-blue));
+  transition: width 0.3s ease;
+  border-radius: 2px;
 }
 
 .navbar__links a:hover::after {
