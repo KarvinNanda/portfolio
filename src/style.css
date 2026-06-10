@@ -1,14 +1,21 @@
 :root {
+  /* Emerald Green & Electric Blue theme */
   --accent: #10b981;
   --accent-soft: rgba(16, 185, 129, 0.15);
   --accent-strong: #34d399;
-  --bg: #0a0f1a;
-  --bg-elevated: #0f1626;
-  --border: rgba(255, 255, 255, 0.08);
-  --text: #e6edf3;
+  --accent-blue: #3b82f6;
+  --accent-purple: #8b5cf6;
+  
+  --bg: #050810;
+  --bg-elevated: rgba(15, 22, 38, 0.6);
+  --border: rgba(255, 255, 255, 0.06);
+  --border-hover: rgba(255, 255, 255, 0.15);
+  
+  --text: #f8fafc;
   --text-muted: #94a3b8;
-  --max-width: 1080px;
+  --max-width: 1120px;
 
+  /* Tag Colors */
   --color-languages: #3b82f6;
   --color-frameworks: #10b981;
   --color-database: #f59e0b;
@@ -23,23 +30,55 @@
   box-sizing: border-box;
 }
 
-html,
-body {
+html, body {
   margin: 0;
   padding: 0;
-  background: var(--bg);
+  background-color: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
-body {
-  background:
-    radial-gradient(1200px 600px at 80% -10%, rgba(16, 185, 129, 0.08), transparent 60%),
-    radial-gradient(900px 500px at -10% 20%, rgba(59, 130, 246, 0.06), transparent 60%),
-    var(--bg);
-  min-height: 100vh;
+/* Animated background wrapper */
+.bg-animation {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  z-index: -1;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.bg-animation::before,
+.bg-animation::after {
+  content: "";
+  position: absolute;
+  width: 800px;
+  height: 800px;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.15;
+  animation: float 20s infinite alternate ease-in-out;
+}
+
+.bg-animation::before {
+  background: var(--accent);
+  top: -200px;
+  right: -100px;
+}
+
+.bg-animation::after {
+  background: var(--accent-blue);
+  bottom: -200px;
+  left: -100px;
+  animation-delay: -10s;
+}
+
+@keyframes float {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-100px, 100px) scale(1.1); }
+  100% { transform: translate(50px, -50px) scale(0.9); }
 }
 
 a {
@@ -53,22 +92,22 @@ a {
 }
 
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
 }
 ::-webkit-scrollbar-track {
   background: var(--bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 8px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .section {
-  scroll-margin-top: 80px;
-  padding: 96px 24px;
+  scroll-margin-top: 100px;
+  padding: 100px 24px;
 }
 
 .section-inner {
@@ -77,47 +116,68 @@ a {
 }
 
 .section-title {
-  font-size: 32px;
-  font-weight: 700;
+  font-size: 36px;
+  font-weight: 800;
   letter-spacing: -0.02em;
-  margin: 0 0 8px 0;
+  margin: 0 0 12px 0;
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+  background: linear-gradient(to right, #fff, var(--text-muted));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .section-title::before {
   content: "";
   display: inline-block;
-  width: 28px;
+  width: 40px;
   height: 2px;
-  background: var(--accent);
+  background: linear-gradient(90deg, var(--accent), transparent);
   border-radius: 2px;
 }
 
 .section-subtitle {
   color: var(--text-muted);
-  margin: 0 0 40px 0;
-  font-size: 15px;
+  margin: 0 0 48px 0;
+  font-size: 16px;
+  max-width: 600px;
+  line-height: 1.6;
 }
 
-/* Fade-in on scroll */
+/* Sophisticated Reveal Animations */
 .reveal {
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
+  transform: translateY(30px) scale(0.98);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 .reveal.is-visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
+}
+
+/* Staggered reveals for lists/grids */
+.stagger-1 { transition-delay: 0.1s; }
+.stagger-2 { transition-delay: 0.2s; }
+.stagger-3 { transition-delay: 0.3s; }
+.stagger-4 { transition-delay: 0.4s; }
+
+/* Glassmorphism card utility */
+.glass-card {
+  background: var(--bg-elevated) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border) !important;
+  border-radius: 16px;
 }
 
 @media (max-width: 640px) {
   .section {
-    padding: 64px 20px;
+    padding: 72px 20px;
   }
   .section-title {
-    font-size: 26px;
+    font-size: 28px;
   }
 }

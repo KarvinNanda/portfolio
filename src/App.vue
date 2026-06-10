@@ -15,12 +15,13 @@ const themeOverrides = {
     primaryColorHover: '#34d399',
     primaryColorPressed: '#059669',
     primaryColorSuppl: '#10b981',
-    bodyColor: '#0a0f1a',
-    cardColor: '#0f1626',
-    modalColor: '#0f1626',
+    bodyColor: 'transparent',
+    cardColor: 'rgba(15, 22, 38, 0.4)',
+    modalColor: 'rgba(15, 22, 38, 0.8)',
     fontFamily:
       "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
-    fontWeightStrong: '700'
+    fontWeightStrong: '700',
+    borderRadius: '8px'
   }
 }
 
@@ -35,13 +36,14 @@ onMounted(() => {
         }
       })
     },
-    { threshold: 0.12 }
+    { threshold: 0.08, rootMargin: '0px 0px -50px 0px' }
   )
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el))
 })
 </script>
 
 <template>
+  <div class="bg-animation"></div>
   <n-config-provider :theme="darkTheme" :theme-overrides="themeOverrides">
     <n-message-provider>
       <NavBar />

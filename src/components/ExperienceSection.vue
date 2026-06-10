@@ -5,11 +5,11 @@ import { experiences } from '../data/portfolio.js'
 
 <template>
   <section id="experience" class="section">
-    <div class="section-inner reveal">
-      <h2 class="section-title">Experience</h2>
-      <p class="section-subtitle">A timeline of where I've been building things.</p>
+    <div class="section-inner">
+      <h2 class="section-title reveal stagger-1">Experience</h2>
+      <p class="section-subtitle reveal stagger-2">A timeline of where I've been building things.</p>
 
-      <n-timeline size="large" class="timeline">
+      <n-timeline size="large" class="timeline reveal stagger-3">
         <n-timeline-item
           v-for="exp in experiences"
           :key="exp.company"
@@ -48,25 +48,34 @@ import { experiences } from '../data/portfolio.js'
 }
 
 .exp-role {
-  font-weight: 700;
-  font-size: 17px;
+  font-weight: 800;
+  font-size: 18px;
   color: var(--text);
+  letter-spacing: -0.01em;
 }
 
 .exp-company {
-  font-size: 14px;
+  font-size: 15px;
   color: var(--accent-strong);
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 .exp-period {
   font-family: 'JetBrains Mono', monospace;
   font-size: 13px;
   color: var(--text-muted);
-  padding: 4px 10px;
+  padding: 4px 12px;
   border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
   border-radius: 999px;
   white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.exp-header:hover .exp-period {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(16, 185, 129, 0.05);
 }
 
 .exp-duration {

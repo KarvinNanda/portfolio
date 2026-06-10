@@ -63,20 +63,20 @@ onBeforeUnmount(() => {
 
 <template>
   <section id="hero" class="section hero">
-    <div class="section-inner hero__inner reveal">
-      <p class="hero__greeting">Hello, I'm</p>
-      <h1 class="hero__name">{{ profile.name }}</h1>
+    <div class="section-inner hero__inner">
+      <p class="hero__greeting reveal stagger-1">Hello, I'm</p>
+      <h1 class="hero__name reveal stagger-2">{{ profile.name }}</h1>
 
-      <div class="hero__roles">
+      <div class="hero__roles reveal stagger-3">
         <span class="hero__roles-prefix">&gt;</span>
         <span class="hero__roles-text">{{ typed }}</span>
         <span class="hero__caret" aria-hidden="true">|</span>
       </div>
 
-      <p class="hero__tagline">{{ profile.tagline }}</p>
+      <p class="hero__tagline reveal stagger-4">{{ profile.tagline }}</p>
 
-      <div class="hero__cta">
-        <n-button type="primary" size="large" @click="downloadCV">
+      <div class="hero__cta reveal stagger-4">
+        <n-button type="primary" size="large" @click="downloadCV" class="cta-glow">
           <template #icon>
             <n-icon><Download /></n-icon>
           </template>
@@ -89,6 +89,7 @@ onBeforeUnmount(() => {
           target="_blank"
           rel="noopener noreferrer"
           ghost
+          class="cta-ghost"
         >
           <template #icon>
             <n-icon><BrandGithub /></n-icon>
@@ -102,6 +103,7 @@ onBeforeUnmount(() => {
           target="_blank"
           rel="noopener noreferrer"
           ghost
+          class="cta-ghost"
         >
           <template #icon>
             <n-icon><BrandLinkedin /></n-icon>
@@ -129,15 +131,23 @@ onBeforeUnmount(() => {
 }
 
 .hero__name {
-  font-size: clamp(48px, 7vw, 84px);
-  font-weight: 800;
-  line-height: 1.05;
+  font-size: clamp(52px, 8vw, 96px);
+  font-weight: 900;
+  line-height: 1.1;
   letter-spacing: -0.03em;
-  margin: 0 0 20px 0;
-  background: linear-gradient(180deg, #ffffff 0%, #c8d3df 100%);
+  margin: 0 0 24px 0;
+  background: linear-gradient(to right, #fff, var(--accent-strong), var(--accent-blue), #fff);
+  background-size: 300% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  animation: gradientText 8s ease-in-out infinite;
+}
+
+@keyframes gradientText {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .hero__roles {
@@ -185,7 +195,28 @@ onBeforeUnmount(() => {
 .hero__cta {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 16px;
+}
+
+.cta-glow {
+  box-shadow: 0 4px 20px -6px var(--accent);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.cta-glow:hover {
+  box-shadow: 0 8px 30px -8px var(--accent-strong);
+  transform: translateY(-2px);
+}
+
+.cta-ghost {
+  transition: all 0.3s ease;
+}
+
+.cta-ghost:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--accent-blue) !important;
+  color: var(--accent-blue) !important;
+  transform: translateY(-2px);
 }
 
 @media (max-width: 640px) {
