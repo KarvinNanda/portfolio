@@ -48,6 +48,13 @@ export const skills = {
 
 export const projects = [
   {
+    name: "WatchTower",
+    description:
+      "AI-powered finance & security intelligence platform. Monitors crypto, stocks, and gold prices alongside CVE and security news, then delivers personalized bilingual summaries to Telegram.",
+    tech: ["Gin Gonic", "Vue.js 3", "MySQL", "Docker", "Nginx"],
+    repo: "https://github.com/KarvinNanda/watchtower"
+  },
+  {
     name: "Ballet School Management",
     description:
       "A ballet school management system featuring attendance tracking, attendance reports, class creation, student enrollment, and multi-role access (teacher, student, admin) with role-based authorization.",
