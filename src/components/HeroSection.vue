@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
+import posthog from 'posthog-js'
 import { NButton, NIcon } from 'naive-ui'
 import { BrandGithub, BrandLinkedin, Download } from '@vicons/tabler'
 import { profile } from '../data/portfolio.js'
@@ -9,14 +10,8 @@ import { profile } from '../data/portfolio.js'
 const CV_URL = 'https://drive.google.com/uc?export=download&id=12hzDXXFrxIz8OgDZTCG27oULhlCcjmC-'
 
 function downloadCV() {
-  const a = document.createElement('a')
-  a.href = CV_URL
-  a.download = 'Karvin_Nanda_CV.pdf'
-  a.rel = 'noopener noreferrer'
-  a.target = '_blank'
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
+  posthog.capture('resume_downloaded')
+  window.open(CV_URL, '_blank')
 }
 
 const typed = ref('')
