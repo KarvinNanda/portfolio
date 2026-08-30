@@ -4,18 +4,26 @@ export default async function handler(req, res) {
   const projectId = process.env.VITE_POSTHOG_PROJECT_ID
   const apiKey = process.env.POSTHOG_PERSONAL_API_KEY
 
-  const end = new Date().toISOString()
-  const start = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
-
   async function getCount(eventName) {
-    const url = `https://us.posthog.com/api/projects/${projectId}/events/?event=${encodeURIComponent(
-      eventName
-    )}&after=${start}&before=${end}&limit=1`
+    const url = `https://us.posthog.com/api/projects/${projectId}/query/`
     const r = await fetch(url, {
-      headers: { Authorization: `Bearer ${apiKey}` }
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        query: {
+          kind: 'HogQLQuery',
+          query: `SELECT count() FROM events WHERE event = '${eventName}' AND timestamp >= now() - INTERVAL 30 DAY`
+        }
+      })
     })
     const data = await r.json()
-    return data.count ?? 0
+    if (!r.ok) {
+      console.error('PostHog API error:', JSON.stringify(data))
+    }
+    return data.results?.[0]?.[0] ?? 0
   }
 
   try {
@@ -25,6 +33,7 @@ export default async function handler(req, res) {
     ])
     res.json({ pageviews, downloads })
   } catch (err) {
+    console.error(err)
     res.status(500).json({ error: 'Failed to fetch analytics' })
   }
 }
