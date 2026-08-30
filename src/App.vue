@@ -8,6 +8,7 @@ import SkillsSection from './components/SkillsSection.vue'
 import ProjectsSection from './components/ProjectsSection.vue'
 import AchievementsSection from './components/AchievementsSection.vue'
 import ContactSection from './components/ContactSection.vue'
+import TelemetrySection from './components/TelemetrySection.vue'
 
 const themeOverrides = {
   common: {
@@ -54,6 +55,7 @@ onMounted(() => {
         <ProjectsSection />
         <AchievementsSection />
         <ContactSection />
+        <TelemetrySection />
       </main>
     </n-message-provider>
   </n-config-provider>
