@@ -7,7 +7,7 @@ import { profile } from '../data/portfolio.js'
 
 // Google Drive direct-download URL (converted from the share/view link).
 // File ID: 12hzDXXFrxIz8OgDZTCG27oULhlCcjmC-
-const CV_URL = 'https://drive.google.com/uc?export=download&id=12hzDXXFrxIz8OgDZTCG27oULhlCcjmC-'
+const CV_URL = 'https://drive.google.com/file/d/12hzDXXFrxIz8OgDZTCG27oULhlCcjmC-/view?usp=sharing'
 
 function downloadCV() {
   posthog.capture('resume_downloaded')
