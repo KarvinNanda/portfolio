@@ -1,6 +1,6 @@
 export const profile = {
   name: "Karvin Nanda",
-  roles: ["Software Engineer", "Backend Developer", "Blue Team", "Cybersecurity Analyst"],
+  roles: ["Software Engineer", "Backend Developer"],
   tagline:
     "A software engineer with a passion for cybersecurity and a sharp eye for emerging AI technologies. Constantly exploring new tools, frameworks, and methodologies to stay ahead of the curve.",
   email: "karvin.nanda@gmail.com",
