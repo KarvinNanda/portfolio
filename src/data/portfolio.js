@@ -5,7 +5,10 @@ export const profile = {
     "A software engineer with a passion for cybersecurity and a sharp eye for emerging AI technologies. Constantly exploring new tools, frameworks, and methodologies to stay ahead of the curve.",
   email: "karvin.nanda@gmail.com",
   github: "https://github.com/karvinNanda",
-  linkedin: "https://www.linkedin.com/in/karvin~nanda/"
+  linkedin: "https://www.linkedin.com/in/karvin~nanda/",
+  // Hero snapshot card (quick read for recruiters)
+  focus: ["Backend", "Security"],
+  coreStack: ["Go", "Laravel", "Vue 3", "MySQL", "Docker"]
 }
 
 export const experiences = [
@@ -46,48 +49,80 @@ export const skills = {
   ]
 }
 
+// Descriptions, tech and architecture are taken from each repo's README (checked 2026-10-04).
+// architecture: left-to-right stages, rendered by ArchDiagram.vue.
 export const projects = [
   {
     name: "WatchTower",
     description:
-      "AI-powered finance & security intelligence platform. Monitors crypto, stocks, and gold prices alongside CVE and security news, then delivers personalized bilingual summaries to Telegram.",
-    tech: ["Gin Gonic", "Vue.js 3", "MySQL", "Docker", "Nginx"],
-    repo: "https://github.com/KarvinNanda/watchtower"
+      "Multi-user platform that watches crypto, stock and gold prices plus CVE and security feeds (NVD, CISA KEV, advisories). Two scheduled workers run DeepSeek AI analysis and send bilingual alerts through two Telegram bots.",
+    tech: ["Gin Gonic", "Vue.js 3", "MySQL", "Redis", "Docker", "Nginx"],
+    repo: "https://github.com/KarvinNanda/watchtower",
+    architecture: [
+      { stage: "Client", nodes: ["Vue 3 dashboard"] },
+      { stage: "Core", nodes: ["Gin API · JWT cookie", "Scheduler · 4h / 6h"] },
+      { stage: "Data & services", nodes: ["MySQL + Redis", "Market & CVE feeds", "DeepSeek AI", "Telegram bots"] }
+    ]
   },
   {
     name: "Ballet School Management",
     description:
-      "A ballet school management system featuring attendance tracking, attendance reports, class creation, student enrollment, and multi-role access (teacher, student, admin) with role-based authorization.",
-    tech: ["Laravel", "MySQL"],
-    repo: "https://github.com/KarvinNanda/Ballet"
+      "Operations app for a ballet studio: classes, schedules, attendance, student billing and stock sales. Five roles (Head, Admin, Teacher, Finance, Buyer), each with its own middleware and dashboard, plus PDF reports.",
+    tech: ["Laravel", "MySQL", "Bootstrap 5"],
+    repo: "https://github.com/KarvinNanda/Ballet",
+    architecture: [
+      { stage: "Client", nodes: ["Browser · Blade views"] },
+      { stage: "Core", nodes: ["Laravel 9", "Role middleware × 5"] },
+      { stage: "Data & services", nodes: ["MySQL", "DomPDF reports", "Email · password reset"] }
+    ]
   },
   {
     name: "Dorm Monitoring",
     description:
-      "A frontend application for monitoring dormitory facilities, tracking room status and maintenance needs.",
-    tech: ["Vue.js 3"],
-    repo: "https://github.com/KarvinNanda/dorm-monitoring-fe"
+      "Internal frontend for dorm operations: daily tap-in / tap-out attendance, guest visits, inventory, facility reservations and user management, with role-based route guards and push notifications.",
+    tech: ["Vue.js 3", "Pinia", "Tailwind CSS"],
+    repo: "https://github.com/KarvinNanda/dorm-monitoring-fe",
+    architecture: [
+      { stage: "Client", nodes: ["Vue 3 SPA", "Pinia · role guards"] },
+      { stage: "Backend", nodes: ["REST API · separate repo"] },
+      { stage: "Services", nodes: ["OneSignal push"] }
+    ]
   },
   {
     name: "Game Lounge — Customer App",
     description:
-      "Customer-facing frontend for a PlayStation rental service. Users can browse available consoles, view pricing, and make reservations.",
-    tech: ["Vue.js 3"],
-    repo: "https://github.com/KarvinNanda/game_lounge_customer"
+      "Customer web app for a gaming lounge: a 5-step room booking flow (branch, room, date, slot, checkout), private event booking, play credits top-up for members, vouchers and booking history.",
+    tech: ["Vue.js 3", "Pinia", "Tailwind CSS", "Vitest"],
+    repo: "https://github.com/KarvinNanda/game_lounge_customer",
+    architecture: [
+      { stage: "Client", nodes: ["Vue 3 + Pinia", "Auth guard · redirect"] },
+      { stage: "Backend", nodes: ["Game Lounge API"] },
+      { stage: "Features", nodes: ["Room booking", "Event booking", "Play credits"] }
+    ]
   },
   {
     name: "Game Lounge — Admin Dashboard",
     description:
-      "Admin panel for managing PlayStation rental operations including console availability, booking management, and revenue tracking.",
-    tech: ["Vue.js 3"],
-    repo: "https://github.com/KarvinNanda/game_lounge_fe"
+      "Admin dashboard for branch management: bookings, pricing, customers and sales. Routes are gated by permissions, with ECharts dashboards and Excel / PDF export.",
+    tech: ["Vue.js 3", "Element Plus", "ECharts"],
+    repo: "https://github.com/KarvinNanda/game_lounge_fe",
+    architecture: [
+      { stage: "Client", nodes: ["Vue 3 + Element Plus", "Permission guard"] },
+      { stage: "Backend", nodes: ["Game Lounge API"] },
+      { stage: "Output", nodes: ["ECharts dashboards", "Excel / PDF export"] }
+    ]
   },
   {
     name: "Game Lounge — Backend API",
     description:
-      "RESTful API powering the Game Lounge platform. Handles authentication, console management, booking logic, and payment processing.",
-    tech: ["Gin Gonic", "MySQL"],
-    repo: "https://github.com/KarvinNanda/game_lounge_be"
+      "REST API behind both Game Lounge apps: stores and rooms, a pricing engine (happy hour, packages, flash sales), bookings and event bookings, play credits, vouchers, sales reports, and role-based staff access with JWT.",
+    tech: ["Gin Gonic", "GORM", "MySQL"],
+    repo: "https://github.com/KarvinNanda/game_lounge_be",
+    architecture: [
+      { stage: "Clients", nodes: ["Customer app", "Admin dashboard"] },
+      { stage: "Core", nodes: ["Gin · JWT + roles", "Pricing engine", "Booking · credits · voucher"] },
+      { stage: "Data & services", nodes: ["GORM → MySQL", "SMTP email"] }
+    ]
   }
 ]
 
@@ -97,6 +132,7 @@ import socCert from '@/assets/certifications/JH - SOC L1.jpg'
 export const achievements = [
   {
     title: "Certified Red Team Operations Management",
+    shortTitle: "CRTOM",
     type: "certification",
     image: redTeamCert
   },
@@ -113,6 +149,6 @@ export const navLinks = [
   { label: "Experience", href: "#experience" },
   { label: "Skills", href: "#skills" },
   { label: "Projects", href: "#projects" },
-  { label: "Achievements", href: "#achievements" },
+  { label: "Certifications", href: "#certifications" },
   { label: "Contact", href: "#contact" }
 ]

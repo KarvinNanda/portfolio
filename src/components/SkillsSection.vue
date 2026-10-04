@@ -1,175 +1,293 @@
 <script setup>
+import { ref } from 'vue'
+import { Code, Stack2, Database, Server, Language } from '@vicons/tabler'
 import { skills } from '@/data/portfolio.js'
 
 const categories = [
-  { key: 'languages',      label: 'Languages',      color: 'var(--color-languages)',      items: skills.languages },
-  { key: 'frameworks',     label: 'Frameworks',     color: 'var(--color-frameworks)',     items: skills.frameworks },
-  { key: 'database',       label: 'Database',       color: 'var(--color-database)',       items: skills.database },
-  { key: 'infrastructure', label: 'Infrastructure', color: 'var(--color-infrastructure)', items: skills.infrastructure }
+  { key: 'languages', label: 'Languages', icon: Code, color: 'var(--color-languages)', items: skills.languages },
+  { key: 'frameworks', label: 'Frameworks', icon: Stack2, color: 'var(--color-frameworks)', items: skills.frameworks },
+  { key: 'database', label: 'Database', icon: Database, color: 'var(--color-database)', items: skills.database },
+  { key: 'infrastructure', label: 'Infrastructure', icon: Server, color: 'var(--color-infrastructure)', items: skills.infrastructure }
 ]
+
+const LEVELS = { Basic: 1, Intermediate: 2, Proficient: 3 }
+
+const focus = ref('all')
+
+function toggle(key) {
+  focus.value = focus.value === key ? 'all' : key
+}
 </script>
 
 <template>
   <section id="skills" class="section">
-    <div class="section-inner reveal">
-      <h2 class="section-title">Tech Stack</h2>
-      <p class="section-subtitle">Tools and technologies I work with.</p>
+    <div class="section-inner">
+      <header v-reveal class="section-head">
+        <p class="eyebrow"><span class="eyebrow__num">02.</span> skills</p>
+        <h2 class="section-title">Tech stack</h2>
+        <p class="section-subtitle">Tools and technologies I work with day to day. Pick a category to focus it.</p>
+      </header>
 
-      <div class="legend">
-        <span v-for="c in categories" :key="c.key" class="legend__item">
-          <span class="legend__dot" :style="{ background: c.color }" />
+      <div v-reveal="60" class="filters" role="group" aria-label="Focus a category">
+        <button
+          type="button"
+          :class="['filter', { 'is-active': focus === 'all' }]"
+          :aria-pressed="focus === 'all'"
+          @click="focus = 'all'"
+        >All</button>
+        <button
+          v-for="c in categories"
+          :key="c.key"
+          type="button"
+          :class="['filter', { 'is-active': focus === c.key }]"
+          :style="{ '--c': c.color }"
+          :aria-pressed="focus === c.key"
+          @click="toggle(c.key)"
+        >
+          <span class="filter__dot" aria-hidden="true" />
           {{ c.label }}
-        </span>
+          <span class="filter__count">{{ c.items.length }}</span>
+        </button>
       </div>
 
-      <div class="skills-grid">
-        <div v-for="c in categories" :key="c.key" class="skill-group">
-          <h3 class="skill-group__title" :style="{ color: c.color }">{{ c.label }}</h3>
-          <div class="skill-tags">
-            <span
-              v-for="item in c.items"
-              :key="item"
-              class="skill-tag"
-              :style="{ '--c': c.color }"
-            >
-              {{ item }}
-            </span>
+      <div class="bento">
+        <article
+          v-for="(c, i) in categories"
+          :key="c.key"
+          v-reveal="i * 70"
+          v-spotlight
+          :class="['card', 'bento__cell', `bento__cell--${c.key}`, { 'is-dim': focus !== 'all' && focus !== c.key }]"
+          :style="{ '--c': c.color }"
+        >
+          <div class="cell__head">
+            <span class="cell__icon" aria-hidden="true"><component :is="c.icon" /></span>
+            <h3 class="cell__title">{{ c.label }}</h3>
           </div>
-        </div>
-      </div>
+          <ul class="tags">
+            <li v-for="item in c.items" :key="item" class="tag">{{ item }}</li>
+          </ul>
+        </article>
 
-      <div class="languages">
-        <h3 class="languages__title">Spoken Languages</h3>
-        <div class="languages__list">
-          <div v-for="lang in skills.spoken" :key="lang.name" class="lang-card">
-            <span class="lang-name">{{ lang.name }}</span>
-            <span class="lang-level">{{ lang.level }}</span>
+        <article
+          v-reveal="280"
+          v-spotlight
+          :class="['card', 'bento__cell', 'bento__cell--spoken', { 'is-dim': focus !== 'all' }]"
+        >
+          <div class="cell__head">
+            <span class="cell__icon" aria-hidden="true"><Language /></span>
+            <h3 class="cell__title">Spoken</h3>
           </div>
-        </div>
+          <ul class="spoken">
+            <li v-for="lang in skills.spoken" :key="lang.name" class="spoken__row">
+              <span class="spoken__name">{{ lang.name }}</span>
+              <span class="spoken__meter" aria-hidden="true">
+                <i v-for="n in 3" :key="n" :class="{ on: n <= (LEVELS[lang.level] || 0) }" />
+              </span>
+              <span class="spoken__level">{{ lang.level }}</span>
+            </li>
+          </ul>
+        </article>
       </div>
     </div>
   </section>
 </template>
 
 <style scoped>
-.legend {
+.filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 18px;
-  margin-bottom: 28px;
-  padding: 12px 16px;
-  border: 1px dashed var(--border);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.015);
-  width: fit-content;
+  gap: 8px;
+  margin-bottom: 24px;
 }
 
-.legend__item {
+.filter {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-.legend__dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  display: inline-block;
-}
-
-.skills-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-}
-
-.skill-group {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 20px;
-}
-
-.skill-group__title {
-  font-size: 14px;
-  font-weight: 600;
-  margin: 0 0 14px 0;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.skill-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.skill-tag {
-  font-size: 13px;
-  padding: 6px 12px;
+  min-height: 40px;
+  padding: 0 14px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--c) 14%, transparent);
-  color: var(--c);
-  border: 1px solid color-mix(in srgb, var(--c) 32%, transparent);
-  font-weight: 500;
-  transition: transform 0.15s ease, background 0.15s ease;
-}
-
-.skill-tag:hover {
-  transform: translateY(-1px);
-  background: color-mix(in srgb, var(--c) 22%, transparent);
-}
-
-.languages {
-  margin-top: 36px;
-  padding-top: 28px;
-  border-top: 1px solid var(--border);
-}
-
-.languages__title {
-  font-size: 14px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-  margin: 0 0 16px 0;
-}
-
-.languages__list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.lang-card {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--bg-elevated);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 10px 14px;
+  background: rgba(11, 15, 20, 0.6);
+  color: var(--text-muted);
+  font-size: 14px;
+  cursor: pointer;
+  transition: color var(--dur-fast) ease, border-color var(--dur-fast) ease, background var(--dur-fast) ease;
 }
 
-.lang-name {
-  font-weight: 600;
+.filter:hover {
   color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.filter.is-active {
+  color: var(--text);
+  border-color: var(--c, var(--primary));
+  background: color-mix(in srgb, var(--c, var(--primary)) 12%, transparent);
+}
+
+.filter__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c);
+}
+
+.filter__count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.bento {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.bento__cell {
+  padding: 24px;
+  transition:
+    opacity var(--dur) ease,
+    filter var(--dur) ease,
+    border-color var(--dur) var(--ease-out),
+    transform var(--dur) var(--ease-out);
+}
+
+.bento__cell--languages {
+  grid-column: span 2;
+}
+
+.bento__cell.is-dim {
+  opacity: 0.35;
+  filter: saturate(0.3);
+}
+
+.bento__cell:not(.is-dim):hover {
+  transform: translateY(-2px);
+}
+
+.cell__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.cell__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  color: var(--c, var(--primary));
+  background: color-mix(in srgb, var(--c, var(--primary)) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--c, var(--primary)) 28%, transparent);
+}
+
+.cell__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.cell__title {
+  margin: 0;
+  font-family: var(--font-mono);
   font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text);
 }
 
-.lang-level {
+.tags {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  font-size: 14px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  color: var(--text);
+  background: color-mix(in srgb, var(--c) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--c) 24%, transparent);
+  transition: border-color var(--dur-fast) ease, background var(--dur-fast) ease;
+}
+
+.tag:hover {
+  border-color: var(--c);
+  background: color-mix(in srgb, var(--c) 16%, transparent);
+}
+
+.spoken {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.spoken__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    'name level'
+    'meter meter';
+  gap: 6px 12px;
+  align-items: center;
+}
+
+.spoken__name {
+  grid-area: name;
+  font-weight: 500;
+}
+
+.spoken__level {
+  grid-area: level;
+  font-family: var(--font-mono);
   font-size: 12px;
-  color: var(--accent-strong);
-  background: var(--accent-soft);
-  padding: 3px 8px;
-  border-radius: 999px;
+  color: var(--text-muted);
 }
 
-@media (max-width: 720px) {
-  .skills-grid {
+.spoken__meter {
+  grid-area: meter;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+
+.spoken__meter i {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(148, 163, 184, 0.15);
+}
+
+.spoken__meter i.on {
+  background: var(--primary);
+}
+
+@media (max-width: 900px) {
+  .bento {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .bento {
     grid-template-columns: 1fr;
+  }
+  .bento__cell--languages {
+    grid-column: auto;
+  }
+  .filter {
+    min-height: 44px;
   }
 }
 </style>
