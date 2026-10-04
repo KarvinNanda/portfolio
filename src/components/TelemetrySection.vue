@@ -1,59 +1,121 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, markRaw, onMounted, onBeforeUnmount } from 'vue'
+import { Eye, FileDownload } from '@vicons/tabler'
 
 const loading = ref(true)
 const failed = ref(false)
-const pageviews = ref(null)
-const downloads = ref(null)
+const fetchedAt = ref(null)
+const stats = ref([
+  { key: 'pageviews', label: 'Page views', sub: 'last 30 days', icon: markRaw(Eye), value: null, shown: 0 },
+  { key: 'downloads', label: 'Résumé downloads', sub: 'last 30 days', icon: markRaw(FileDownload), value: null, shown: 0 }
+])
 
-function formatNumber(n) {
-  if (n === null || n === undefined) return '—'
-  return new Intl.NumberFormat('en-US').format(n)
+const sectionEl = ref(null)
+let observer = null
+let raf = null
+let inView = false
+
+const status = computed(() => {
+  if (loading.value) return { label: 'Connecting', kind: 'loading' }
+  if (failed.value) return { label: 'Unavailable', kind: 'error' }
+  return { label: 'Live', kind: 'live' }
+})
+
+const fetchedLabel = computed(() =>
+  fetchedAt.value
+    ? new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit' }).format(fetchedAt.value)
+    : null
+)
+
+const fmt = n => new Intl.NumberFormat('en-US').format(n)
+
+// Count from 0 to the real value once data is loaded AND the section is visible.
+function countUp() {
+  if (loading.value || failed.value || !inView) return
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const start = performance.now()
+  const DURATION = 1200
+  const step = now => {
+    const t = reduce ? 1 : Math.min((now - start) / DURATION, 1)
+    const eased = 1 - Math.pow(1 - t, 3)
+    stats.value.forEach(s => (s.shown = Math.round((s.value ?? 0) * eased)))
+    if (t < 1) raf = requestAnimationFrame(step)
+  }
+  raf = requestAnimationFrame(step)
 }
 
 onMounted(async () => {
+  observer = new IntersectionObserver(
+    ([entry]) => {
+      if (entry.isIntersecting) {
+        inView = true
+        countUp()
+        observer.disconnect()
+      }
+    },
+    { threshold: 0.3 }
+  )
+  if (sectionEl.value) observer.observe(sectionEl.value)
+
   try {
     const r = await fetch('/api/analytics')
     if (!r.ok) throw new Error(`HTTP ${r.status}`)
     const data = await r.json()
-    pageviews.value = data.pageviews ?? null
-    downloads.value = data.downloads ?? null
-    if (pageviews.value === null && downloads.value === null) {
-      failed.value = true
-    }
-  } catch (e) {
+    stats.value.forEach(s => (s.value = data[s.key] ?? null))
+    failed.value = stats.value.every(s => s.value === null)
+    fetchedAt.value = new Date()
+  } catch {
     failed.value = true
   } finally {
     loading.value = false
+    countUp()
   }
+})
+
+onBeforeUnmount(() => {
+  observer?.disconnect()
+  if (raf) cancelAnimationFrame(raf)
 })
 </script>
 
 <template>
-  <section id="telemetry" class="section telemetry">
-    <div class="section-inner telemetry__inner reveal">
-      <p class="telemetry__eyebrow">Live analytics</p>
-      <h2 class="telemetry__heading">Telemetry</h2>
+  <section id="telemetry" ref="sectionEl" class="section telemetry" aria-labelledby="telemetry-title">
+    <div class="section-inner">
+      <div v-reveal class="telemetry__head">
+        <div>
+          <p class="eyebrow"><span class="eyebrow__num">06.</span> telemetry</p>
+          <h2 id="telemetry-title" class="telemetry__title">This site, by the numbers</h2>
+        </div>
+        <p :class="['status', `status--${status.kind}`]" role="status">
+          <span class="status__dot" aria-hidden="true" />
+          {{ status.label }}
+          <span v-if="fetchedLabel" class="status__time">· fetched {{ fetchedLabel }}</span>
+        </p>
+      </div>
 
       <div class="telemetry__grid">
-        <div class="telemetry__stat">
-          <span
-            class="telemetry__value"
-            :class="{ 'is-loading': loading }"
-          >{{ loading ? '0000' : (failed ? '—' : formatNumber(pageviews)) }}</span>
-          <span class="telemetry__label">Page views · last 30 days</span>
-        </div>
-        <div class="telemetry__stat">
-          <span
-            class="telemetry__value"
-            :class="{ 'is-loading': loading }"
-          >{{ loading ? '000' : (failed ? '—' : formatNumber(downloads)) }}</span>
-          <span class="telemetry__label">Résumé downloads · last 30 days</span>
+        <div
+          v-for="(s, i) in stats"
+          :key="s.key"
+          v-reveal="i * 100"
+          v-spotlight
+          class="card stat"
+        >
+          <span class="stat__icon" aria-hidden="true"><component :is="s.icon" /></span>
+          <span :class="['stat__value', { 'is-loading': loading }]">
+            <template v-if="loading">0000</template>
+            <span v-else-if="failed || s.value === null" class="stat__na">n/a</span>
+            <template v-else>
+              <span aria-hidden="true">{{ fmt(s.shown) }}</span>
+              <span class="sr-only">{{ fmt(s.value) }}</span>
+            </template>
+          </span>
+          <span class="stat__label">{{ s.label }} <span class="stat__sub">· {{ s.sub }}</span></span>
         </div>
       </div>
 
       <p class="telemetry__note">
-        Via PostHog — page loads, not unique visitors
+        Source: PostHog. Counts are page loads, not unique visitors.
       </p>
     </div>
   </section>
@@ -61,91 +123,158 @@ onMounted(async () => {
 
 <style scoped>
 .telemetry {
-  padding-top: 64px;
+  padding-top: 48px;
   padding-bottom: 96px;
 }
 
-.telemetry__inner {
-  text-align: center;
+.telemetry__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
 }
 
-.telemetry__eyebrow {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  color: var(--accent-strong);
-  letter-spacing: 0.06em;
-  margin: 0 0 12px 0;
+.telemetry__title {
+  font-family: var(--font-mono);
+  font-size: clamp(22px, 3vw, 28px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 0;
 }
 
-.telemetry__heading {
-  font-size: clamp(28px, 4vw, 40px);
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  margin: 0 0 40px 0;
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.status__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-dim);
+}
+
+.status--live {
+  color: var(--primary-strong);
+  border-color: rgba(74, 222, 128, 0.35);
+}
+.status--live .status__dot {
+  background: var(--primary);
+  box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6);
+  animation: pulse 2s infinite;
+}
+.status--loading .status__dot {
+  background: var(--amber);
+  animation: pulse-amber 1s infinite;
+}
+.status--error {
+  color: #fca5a5;
+  border-color: rgba(248, 113, 113, 0.35);
+}
+.status--error .status__dot {
+  background: #f87171;
+}
+
+.status__time {
+  color: var(--text-dim);
+}
+
+@keyframes pulse {
+  70% { box-shadow: 0 0 0 8px rgba(74, 222, 128, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+}
+@keyframes pulse-amber {
+  50% { opacity: 0.3; }
 }
 
 .telemetry__grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 24px;
-  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
-.telemetry__stat {
-  min-width: 220px;
-  flex: 1 1 220px;
-  max-width: 320px;
-  padding: 32px 24px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+.stat {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 12px;
+  gap: 10px;
+  padding: 28px;
 }
 
-.telemetry__value {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: clamp(36px, 6vw, 52px);
+.stat__icon {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  color: var(--cyan);
+  background: rgba(34, 211, 238, 0.08);
+  border: 1px solid rgba(34, 211, 238, 0.25);
+}
+
+.stat__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.stat__value {
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: clamp(40px, 6vw, 60px);
   font-weight: 700;
-  line-height: 1;
-  color: var(--accent);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  color: var(--text);
   font-variant-numeric: tabular-nums;
 }
 
-.telemetry__value.is-loading {
+.stat__value.is-loading {
   color: transparent;
   border-radius: 8px;
-  background: linear-gradient(
-    90deg,
-    var(--accent-soft) 25%,
-    rgba(16, 185, 129, 0.28) 37%,
-    var(--accent-soft) 63%
-  );
+  background: linear-gradient(90deg, rgba(148, 163, 184, 0.08) 25%, rgba(148, 163, 184, 0.18) 37%, rgba(148, 163, 184, 0.08) 63%);
   background-size: 400% 100%;
-  animation: telemetry-shimmer 1.4s ease infinite;
+  animation: shimmer 1.4s ease infinite;
 }
 
-@keyframes telemetry-shimmer {
+@keyframes shimmer {
   0% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
 
-.telemetry__label {
-  font-size: 13px;
+.stat__na {
+  color: var(--text-dim);
+}
+
+.stat__label {
+  font-size: 15px;
+  color: var(--text);
+}
+
+.stat__sub {
   color: var(--text-muted);
-  letter-spacing: 0.02em;
 }
 
 .telemetry__note {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  color: var(--text-muted);
-  opacity: 0.7;
   margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+@media (max-width: 600px) {
+  .telemetry__grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
