@@ -67,6 +67,10 @@ const repoPath = url => url.replace('https://github.com/', '')
 
           <ArchDiagram v-if="project.architecture" :stages="project.architecture" />
 
+          <ul v-if="project.highlights" class="project__highlights" aria-label="Highlights">
+            <li v-for="h in project.highlights" :key="h">{{ h }}</li>
+          </ul>
+
           <div class="project__foot">
             <ul class="project__tech" aria-label="Tech stack">
               <li v-for="t in project.tech" :key="t" :class="{ 'is-match': t === filter }">{{ t }}</li>
@@ -208,6 +212,35 @@ const repoPath = url => url.replace('https://github.com/', '')
   font-size: 15px;
   line-height: 1.65;
   flex: 1;
+}
+
+/* Proof points (tests, security, CI). Chips stay on one line; the list wraps between chips. */
+.project__highlights {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+.project__highlights li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.project__highlights li::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 6px rgba(74, 222, 128, 0.6);
 }
 
 .project__foot {
