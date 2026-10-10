@@ -49,8 +49,10 @@ export const skills = {
   ]
 }
 
-// Descriptions, tech and architecture are taken from each repo's README (checked 2026-10-04).
+// Descriptions, tech and architecture are taken from each repo's default branch.
+// WatchTower: README, checked 2026-10-04. Other projects: code + README, re-checked 2026-10-10.
 // architecture: left-to-right stages, rendered by ArchDiagram.vue.
+// highlights: max 3 short proof points (test file counts are file counts, not coverage).
 export const projects = [
   {
     name: "WatchTower",
@@ -67,62 +69,67 @@ export const projects = [
   {
     name: "Ballet School Management",
     description:
-      "Operations app for a ballet studio: classes, schedules, attendance, student billing and stock sales. Five roles (Head, Admin, Teacher, Finance, Buyer), each with its own middleware and dashboard, plus PDF reports.",
-    tech: ["Laravel", "MySQL", "Bootstrap 5"],
+      "Operations app for a ballet studio: classes, schedules, attendance, student billing, stock sales and PDF reports. Five roles (Head, Admin, Teacher, Finance, Buyer) are enforced by role middleware and Gates, and attendance is blocked until required payments are made.",
+    tech: ["Laravel", "MySQL", "Bootstrap 5", "PHPUnit"],
     repo: "https://github.com/KarvinNanda/Ballet",
     architecture: [
-      { stage: "Client", nodes: ["Browser · Blade views"] },
-      { stage: "Core", nodes: ["Laravel 9", "Role middleware × 5"] },
-      { stage: "Data & services", nodes: ["MySQL", "DomPDF reports", "Email · password reset"] }
-    ]
+      { stage: "Client", nodes: ["Browser · Blade + Bootstrap"] },
+      { stage: "Core", nodes: ["Laravel 13 · PHP 8.4", "Role middleware + Gates"] },
+      { stage: "Data & services", nodes: ["MySQL 8", "DomPDF reports", "SMTP email"] }
+    ],
+    highlights: ["100 PHPUnit test files", "HTML sanitized · HTMLPurifier", "CI · audit + tests"]
   },
   {
     name: "Dorm Monitoring",
     description:
-      "Internal frontend for dorm operations: daily tap-in / tap-out attendance, guest visits, inventory, facility reservations and user management, with role-based route guards and push notifications.",
-    tech: ["Vue.js 3", "Pinia", "Tailwind CSS"],
+      "Internal dorm management frontend: daily tap-in / tap-out attendance, guest visit logs, inventory with stock transactions, facility reservations and user management. Routes are guarded per role (admin, resident, receptionist, guest), JWTs refresh automatically, and alerts arrive as push notifications.",
+    tech: ["Vue.js 3", "Pinia", "Tailwind CSS", "Vitest"],
     repo: "https://github.com/KarvinNanda/dorm-monitoring-fe",
     architecture: [
-      { stage: "Client", nodes: ["Vue 3 SPA", "Pinia · role guards"] },
-      { stage: "Backend", nodes: ["REST API · separate repo"] },
+      { stage: "Client", nodes: ["Vue 3 SPA", "Role guards · JWT refresh"] },
+      { stage: "Backend", nodes: ["NestJS API · separate repo", "PostgreSQL"] },
       { stage: "Services", nodes: ["OneSignal push"] }
-    ]
+    ],
+    highlights: ["31 test files · security suite", "Refresh-token request queue", "CI · build + test + audit"]
   },
   {
     name: "Game Lounge — Customer App",
     description:
-      "Customer web app for a gaming lounge: a 5-step room booking flow (branch, room, date, slot, checkout), private event booking, play credits top-up for members, vouchers and booking history.",
+      "Customer web app for a gaming lounge chain: a 5-step room booking flow with server-side pricing, private venue booking, play credits, vouchers and F&B ordering during a session. Payments run through Xendit checkout, and the session lives in an httpOnly cookie.",
     tech: ["Vue.js 3", "Pinia", "Tailwind CSS", "Vitest"],
     repo: "https://github.com/KarvinNanda/game_lounge_customer",
     architecture: [
-      { stage: "Client", nodes: ["Vue 3 + Pinia", "Auth guard · redirect"] },
+      { stage: "Client", nodes: ["Vue 3 + Pinia", "httpOnly cookie session"] },
       { stage: "Backend", nodes: ["Game Lounge API"] },
-      { stage: "Features", nodes: ["Room booking", "Event booking", "Play credits"] }
-    ]
+      { stage: "Payments", nodes: ["Xendit checkout", "Webhook confirms booking"] }
+    ],
+    highlights: ["64 test files", "Payment host allowlist", "CI · audit, test, coverage"]
   },
   {
     name: "Game Lounge — Admin Dashboard",
     description:
-      "Admin dashboard for branch management: bookings, pricing, customers and sales. Routes are gated by permissions, with ECharts dashboards and Excel / PDF export.",
-    tech: ["Vue.js 3", "Element Plus", "ECharts"],
+      "Admin dashboard for a multi-branch gaming lounge: live booking grid, pricing, customers, play credits, vouchers, staff and roles, and a sales dashboard with Excel / PDF export. Every route and menu is gated by permission keys and scoped to the staff member's branches.",
+    tech: ["Vue.js 3", "Element Plus", "ECharts", "Vitest"],
     repo: "https://github.com/KarvinNanda/game_lounge_fe",
     architecture: [
-      { stage: "Client", nodes: ["Vue 3 + Element Plus", "Permission guard"] },
-      { stage: "Backend", nodes: ["Game Lounge API"] },
+      { stage: "Client", nodes: ["Vue 3 + Element Plus", "Permission + branch guards"] },
+      { stage: "Backend", nodes: ["Game Lounge API · cookie auth"] },
       { stage: "Output", nodes: ["ECharts dashboards", "Excel / PDF export"] }
-    ]
+    ],
+    highlights: ["48 test files", "CSP + HSTS via nginx", "CI · audit, lint, test, build"]
   },
   {
     name: "Game Lounge — Backend API",
     description:
-      "REST API behind both Game Lounge apps: stores and rooms, a pricing engine (happy hour, packages, flash sales), bookings and event bookings, play credits, vouchers, sales reports, and role-based staff access with JWT.",
+      "Go REST API behind both Game Lounge apps. A pricing engine combines happy hour, flash sales and the cheapest package mix (dynamic programming); bookings are held for 15 minutes until a Xendit webhook confirms payment. Also covers play credits, vouchers, F&B synced from Moka POS, and sales reports.",
     tech: ["Gin Gonic", "GORM", "MySQL"],
     repo: "https://github.com/KarvinNanda/game_lounge_be",
     architecture: [
       { stage: "Clients", nodes: ["Customer app", "Admin dashboard"] },
-      { stage: "Core", nodes: ["Gin · JWT + roles", "Pricing engine", "Booking · credits · voucher"] },
-      { stage: "Data & services", nodes: ["GORM → MySQL", "SMTP email"] }
-    ]
+      { stage: "Core", nodes: ["Gin · cookie JWT + permissions", "Pricing engine · DP", "Booking holds · 15 min"] },
+      { stage: "Data & services", nodes: ["GORM → MySQL", "Xendit webhooks", "SMTP · Moka POS"] }
+    ],
+    highlights: ["53 Go test files · -race", "JWT token versioning", "CI · vet + test"]
   }
 ]
 
