@@ -50,21 +50,22 @@ export const skills = {
 }
 
 // Descriptions, tech and architecture are taken from each repo's default branch.
-// WatchTower: README, checked 2026-10-04. Other projects: code + README, re-checked 2026-10-10.
+// WatchTower: code, re-checked 2026-10-16. Other projects: code + README, re-checked 2026-10-10.
 // architecture: left-to-right stages, rendered by ArchDiagram.vue.
 // highlights: max 3 short proof points (test file counts are file counts, not coverage).
 export const projects = [
   {
     name: "WatchTower",
     description:
-      "Multi-user platform that watches crypto, stock and gold prices plus CVE and security feeds (NVD, CISA KEV, advisories). Two scheduled workers run DeepSeek AI analysis and send bilingual alerts through two Telegram bots.",
+      "Self-hostable, multi-user alerting for crypto, stocks and Antam gold (priced in rupiah), plus a threat-intel feed from NVD, CISA KEV, GitHub advisories, Exploit-DB and security news. Users set price-level, 24h-change, trailing-stop and 52-week-break rules; two scheduled pipelines check them and alert through two Telegram bots.",
     tech: ["Gin Gonic", "Vue.js 3", "MySQL", "Redis", "Docker", "Nginx"],
     repo: "https://github.com/KarvinNanda/watchtower",
     architecture: [
-      { stage: "Client", nodes: ["Vue 3 dashboard"] },
-      { stage: "Core", nodes: ["Gin API · JWT cookie", "Scheduler · 4h / 6h"] },
-      { stage: "Data & services", nodes: ["MySQL + Redis", "Market & CVE feeds", "DeepSeek AI", "Telegram bots"] }
-    ]
+      { stage: "Client", nodes: ["Vue 3 dashboard · EN / ID"] },
+      { stage: "Core", nodes: ["Gin API · httpOnly JWT", "Scheduler · 4h / 6h", "Redis queue · manual runs"] },
+      { stage: "Data & services", nodes: ["MySQL + Redis", "Market APIs + IDR rate", "Threat-intel feeds", "Telegram bots"] }
+    ],
+    highlights: ["66 test files · go test -race", "CI · govulncheck, gosec, npm audit", "Daily API credit budget"]
   },
   {
     name: "Ballet School Management",
