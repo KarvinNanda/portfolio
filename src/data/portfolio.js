@@ -50,7 +50,8 @@ export const skills = {
 }
 
 // Descriptions, tech and architecture are taken from each repo's default branch.
-// WatchTower: code, re-checked 2026-10-16. Other projects: code + README, re-checked 2026-10-10.
+// WatchTower: code, re-checked 2026-10-16. Game Lounge Customer: code + README, re-checked 2026-10-20.
+// Other projects: code + README, re-checked 2026-10-10.
 // architecture: left-to-right stages, rendered by ArchDiagram.vue.
 // highlights: max 3 short proof points (test file counts are file counts, not coverage).
 export const projects = [
@@ -96,15 +97,15 @@ export const projects = [
   {
     name: "Game Lounge — Customer App",
     description:
-      "Customer web app for a gaming lounge chain: a 5-step room booking flow with server-side pricing, private venue booking, play credits, vouchers and F&B ordering during a session. Payments run through Xendit checkout, and the session lives in an httpOnly cookie.",
+      "Customer web app for a gaming lounge chain: room booking in locked steps (branch → room → date → time) with server-side pricing, private venue booking, play credits, vouchers and F&B ordering during a session. Payments run through Xendit checkout, the session lives in an httpOnly cookie, and a test blocks raw hex colors in components.",
     tech: ["Vue.js 3", "Pinia", "Tailwind CSS", "Vitest"],
     repo: "https://github.com/KarvinNanda/game_lounge_customer",
     architecture: [
-      { stage: "Client", nodes: ["Vue 3 + Pinia", "httpOnly cookie session"] },
+      { stage: "Client", nodes: ["Vue 3 + Pinia", "Locked-step checkout", "httpOnly cookie session"] },
       { stage: "Backend", nodes: ["Game Lounge API"] },
       { stage: "Payments", nodes: ["Xendit checkout", "Webhook confirms booking"] }
     ],
-    highlights: ["64 test files", "Payment host allowlist", "CI · audit, test, coverage"]
+    highlights: ["74 test files", "Payment host allowlist", "CI · audit, test, coverage"]
   },
   {
     name: "Game Lounge — Admin Dashboard",
